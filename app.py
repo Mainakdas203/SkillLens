@@ -1,4 +1,5 @@
 import streamlit as st
+import plotly.express as px
 
 from utils.resume_parser import parse_resume
 from utils.skill_extractor import extract_skills_by_category
@@ -110,6 +111,7 @@ if st.button("Analyze Resume", type="primary"):
                 result
             )
 
+
             # ==================================
             # DISPLAY RESULTS
             # ==================================
@@ -144,13 +146,114 @@ if st.button("Analyze Resume", type="primary"):
                 "not overall job suitability."
             )
 
+
+            # ==================================
+            # VISUAL ANALYTICS DASHBOARD
+            # ==================================
+
+            st.divider()
+
+            st.header("5. Visual Analytics Dashboard")
+
+            # Calculate matched and missing skill counts
+            matched_count = result["total_matched"]
+
+            missing_count = (
+                result["total_required"] - result["total_matched"]
+            )
+
+            # ----------------------------------
+            # DONUT CHART
+            # ----------------------------------
+
+            st.subheader("Skill Match Distribution")
+
+            skill_data = {
+                "Skill Status": [
+                    "Matched Skills",
+                    "Missing Skills"
+                ],
+                "Count": [
+                    matched_count,
+                    missing_count
+                ]
+            }
+
+            fig_pie = px.pie(
+                skill_data,
+                names="Skill Status",
+                values="Count",
+                hole=0.55,
+                title="Matched vs Missing Skills",
+                color="Skill Status",
+                color_discrete_map={
+                    "Matched Skills": "#16A34A",
+                    "Missing Skills": "#EF4444"
+                }
+            )
+
+            fig_pie.update_layout(
+                template="plotly_dark",
+                height=400
+            )
+
+            st.plotly_chart(
+                fig_pie,
+                use_container_width=True
+            )
+
+
+            # ----------------------------------
+            # CATEGORY-WISE BAR CHART
+            # ----------------------------------
+
+            st.subheader("Category-wise Performance")
+
+            category_data = []
+
+            for category, details in result["categories"].items():
+
+                category_data.append({
+                    "Category": category,
+                    "Match Percentage": details["match_percentage"]
+                })
+
+            fig_bar = px.bar(
+                category_data,
+                x="Category",
+                y="Match Percentage",
+                text="Match Percentage",
+                title="Skill Match by Category",
+                range_y=[0, 110],
+                color="Category"
+            )
+
+            fig_bar.update_traces(
+                texttemplate="%{text}%",
+                textposition="outside"
+            )
+
+            fig_bar.update_layout(
+                template="plotly_dark",
+                height=450,
+                yaxis_title="Match Percentage",
+                xaxis_title="Skill Category",
+                showlegend=False
+            )
+
+            st.plotly_chart(
+                fig_bar,
+                use_container_width=True
+            )
+
+
             # ==================================
             # CATEGORY-WISE ANALYSIS
             # ==================================
 
             st.divider()
 
-            st.header("5. Category-wise Analysis")
+            st.header("6. Category-wise Analysis")
 
             for category, details in result["categories"].items():
 
@@ -186,13 +289,14 @@ if st.button("Analyze Resume", type="primary"):
                     else:
                         st.success("No missing skills.")
 
+
             # ==================================
             # CANDIDATE SKILLS
             # ==================================
 
             st.divider()
 
-            st.header("6. Skills Found in Resume")
+            st.header("7. Skills Found in Resume")
 
             for category, skills in candidate_skills.items():
 
@@ -203,13 +307,14 @@ if st.button("Analyze Resume", type="primary"):
                 else:
                     st.write("No recognized skills found.")
 
+
             # ==================================
             # DOWNLOAD REPORT
             # ==================================
 
             st.divider()
 
-            st.header("7. Download Analysis Report")
+            st.header("8. Download Analysis Report")
 
             st.download_button(
                 label="Download Detailed Analysis Report",
@@ -217,6 +322,7 @@ if st.button("Analyze Resume", type="primary"):
                 file_name="SkillLens_Analysis_Report.txt",
                 mime="text/plain"
             )
+
 
         except Exception as error:
 
