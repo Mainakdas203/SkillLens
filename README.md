@@ -13,6 +13,11 @@ It identifies matching and missing skills, calculates skill match percentages, a
 - Calculate overall and category-wise skill match percentages.
 - Identify matched and missing skills.
 - Generate downloadable analysis reports.
+- Interactive visual analytics dashboard using Plotly.
+- Donut chart showing matched vs. missing skills.
+- Bar chart displaying category-wise skill match percentages.
+- Detailed downloadable skill gap analysis report.
+- Supports both PDF and DOCX resume formats.
 
 ## Tech Stack
 
